@@ -35,17 +35,17 @@ window.init = async () => {
   scene.add(plane);
 
   symmetrical_abstract_ball = await load('./assets/symmetrical_abstract_ball/scene.gltf');
-  symmetrical_abstract_ball.position.y += 1.5; // Keep model lifted above the plane
+  //symmetrical_abstract_ball.position.y += 1.5; // Keep model lifted above the plane
   symmetrical_abstract_ball.scale.set(0.1, 0.1, 0.1); // Scale down the model
   scene.add(symmetrical_abstract_ball);
 
   console.log('made a scene', symmetrical_abstract_ball);
 };
 
-let acc = 0.001;
+let acc = 0.0001;
 
 // Decrease the turn speed for slower rotation
-let turnSpeed = 0.001;
+let turnSpeed = 0.0001;
 
 let drag = 0.98;
 let velocity = 0;
@@ -65,10 +65,21 @@ window.loop = (dt, input) => {
       symmetrical_abstract_ball.rotateY(-turnSpeed * dt * velocity);
     }
 
+    
+
     const forward = new THREE.Vector3();
     symmetrical_abstract_ball.getWorldDirection(forward);
     symmetrical_abstract_ball.position.addScaledVector(forward, velocity * dt);
 
+    // Plane boundaries assuming the plane's center is at (0, 0) and scale is 50
+    const planeBoundaryX = 50 / 2; // half the width
+    const planeBoundaryZ = 50 / 2; // half the depth
+
+    // Clamp the ball's position to the plane's boundaries
+    symmetrical_abstract_ball.position.x = Math.max(-planeBoundaryX, Math.min(planeBoundaryX, symmetrical_abstract_ball.position.x));
+    symmetrical_abstract_ball.position.z = Math.max(-planeBoundaryZ, Math.min(planeBoundaryZ, symmetrical_abstract_ball.position.z));
+
+    // Look at the ball with the camera
     camera.lookAt(symmetrical_abstract_ball.position);
   }
   renderer.render(scene, camera);
