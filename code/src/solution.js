@@ -52,35 +52,37 @@ window.init = async () => {
 window.loop = (dt, input) => {
   if (iron_ball_2) {
     const movementSpeed = 0.01; // Adjust the movement speed as needed
+    const rotationSpeed = 0.1; // Adjust the rotation speed as needed
 
+    // Movement
     if (input.keys.has('ArrowUp')) {
-      // Move forward (along the negative Z axis in Three.js)
       iron_ball_2.position.z -= movementSpeed * dt;
+      iron_ball_2.rotation.x += rotationSpeed * dt; // Rotates the ball on the x-axis
     }
     if (input.keys.has('ArrowDown')) {
-      // Move backward (along the positive Z axis)
       iron_ball_2.position.z += movementSpeed * dt;
+      iron_ball_2.rotation.x -= rotationSpeed * dt; // Rotates the ball on the x-axis in the opposite direction
     }
     if (input.keys.has('ArrowLeft')) {
-      // Move left (along the negative X axis)
       iron_ball_2.position.x -= movementSpeed * dt;
+      iron_ball_2.rotation.z -= rotationSpeed * dt; // Rotates the ball on the z-axis
     }
     if (input.keys.has('ArrowRight')) {
-      // Move right (along the positive X axis)
       iron_ball_2.position.x += movementSpeed * dt;
+      iron_ball_2.rotation.z += rotationSpeed * dt; // Rotates the ball on the z-axis in the opposite direction
     }
 
-    // Plane boundaries assuming the plane's center is at (0, 0) and scale is 50
+    // Clamp the ball's position to the plane's boundaries
     const planeBoundaryX = 50 / 2; // half the width
     const planeBoundaryZ = 50 / 2; // half the depth
-
-    // Clamp the ball's position to the plane's boundaries
     iron_ball_2.position.x = Math.max(-planeBoundaryX, Math.min(planeBoundaryX, iron_ball_2.position.x));
     iron_ball_2.position.z = Math.max(-planeBoundaryZ, Math.min(planeBoundaryZ, iron_ball_2.position.z));
 
-    // Look at the ball with the camera
+    // Update the camera to keep looking at the ball
     camera.lookAt(iron_ball_2.position);
   }
+
+  // Render the scene
   renderer.render(scene, camera);
 };
 
