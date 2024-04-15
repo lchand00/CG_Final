@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let renderer, scene, camera, iron_ball_2;
 
@@ -42,34 +43,22 @@ window.init = async () => {
   console.log('made a scene', iron_ball_2);
 };
 
-//let acc = 0.0001;
-
-// Decrease the turn speed for slower rotation
-//let turnSpeed = 0.0001;
-
-//let drag = 0.98;
-//let velocity = 0;
 window.loop = (dt, input) => {
   if (iron_ball_2) {
-    const movementSpeed = 0.01; // Adjust the movement speed as needed
-    const rotationSpeed = 0.1; // Adjust the rotation speed as needed
+    const movementSpeed = 0.1; // Adjust the movement speed as needed
 
-    // Movement
+    // Movement based on keyboard input
     if (input.keys.has('ArrowUp')) {
       iron_ball_2.position.z -= movementSpeed * dt;
-      iron_ball_2.rotation.x += rotationSpeed * dt; // Rotates the ball on the x-axis
     }
     if (input.keys.has('ArrowDown')) {
       iron_ball_2.position.z += movementSpeed * dt;
-      iron_ball_2.rotation.x -= rotationSpeed * dt; // Rotates the ball on the x-axis in the opposite direction
     }
     if (input.keys.has('ArrowLeft')) {
       iron_ball_2.position.x -= movementSpeed * dt;
-      iron_ball_2.rotation.z -= rotationSpeed * dt; // Rotates the ball on the z-axis
     }
     if (input.keys.has('ArrowRight')) {
       iron_ball_2.position.x += movementSpeed * dt;
-      iron_ball_2.rotation.z += rotationSpeed * dt; // Rotates the ball on the z-axis in the opposite direction
     }
 
     // Clamp the ball's position to the plane's boundaries
@@ -78,12 +67,12 @@ window.loop = (dt, input) => {
     iron_ball_2.position.x = Math.max(-planeBoundaryX, Math.min(planeBoundaryX, iron_ball_2.position.x));
     iron_ball_2.position.z = Math.max(-planeBoundaryZ, Math.min(planeBoundaryZ, iron_ball_2.position.z));
 
-    // Update the camera to keep looking at the ball
+    // Update the camera to follow the ball's movement
+    camera.position.x = iron_ball_2.position.x + 10;
+    camera.position.z = iron_ball_2.position.z + 10;
     camera.lookAt(iron_ball_2.position);
   }
 
   // Render the scene
   renderer.render(scene, camera);
 };
-
-
