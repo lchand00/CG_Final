@@ -1,0 +1,11 @@
+Model Information:
+* title:	Beast Ball
+* source:	https://sketchfab.com/3d-models/beast-ball-85df964044de44edb3c5ff980ca5b669
+* author:	ExcaliburZero (https://sketchfab.com/excaliburzero)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Beast Ball" (https://sketchfab.com/3d-models/beast-ball-85df964044de44edb3c5ff980ca5b669) by ExcaliburZero (https://sketchfab.com/excaliburzero) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

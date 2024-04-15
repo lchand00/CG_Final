@@ -1,0 +1,11 @@
+Model Information:
+* title:	Iron Ball 2
+* source:	https://sketchfab.com/3d-models/iron-ball-2-7945a0d7f2d540dcbb91f567783cd697
+* author:	Aiekick (https://sketchfab.com/Aiekick)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Iron Ball 2" (https://sketchfab.com/3d-models/iron-ball-2-7945a0d7f2d540dcbb91f567783cd697) by Aiekick (https://sketchfab.com/Aiekick) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
