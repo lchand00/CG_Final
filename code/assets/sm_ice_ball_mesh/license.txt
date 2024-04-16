@@ -1,0 +1,11 @@
+Model Information:
+* title:	SM Ice Ball Mesh
+* source:	https://sketchfab.com/3d-models/sm-ice-ball-mesh-03715d7247d1407c87d84485573983bd
+* author:	srgallimore (https://sketchfab.com/srgallimore)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "SM Ice Ball Mesh" (https://sketchfab.com/3d-models/sm-ice-ball-mesh-03715d7247d1407c87d84485573983bd) by srgallimore (https://sketchfab.com/srgallimore) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

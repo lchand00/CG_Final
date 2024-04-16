@@ -23,10 +23,10 @@ window.init = async () => {
   scene.add(directionalLight);
 
   const geometry = new THREE.PlaneGeometry(1, 1);
-  const texture = new THREE.TextureLoader().load('./assets/153_artificial green grass texture-seamless.jpg');
+  const texture = new THREE.TextureLoader().load('./assets/Grass_seamless.jpg');
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(75, 75);
+  texture.repeat.set(5, 5);
   const material = new THREE.MeshBasicMaterial({
     map: texture,
   });
@@ -42,34 +42,33 @@ window.init = async () => {
 
   console.log('made a scene', iron_ball_2);
 };
-
 window.loop = (dt, input) => {
   if (iron_ball_2) {
-    const movementSpeed = 0.002; // Movement speed
+    const movementSpeed = 0.005; // Movement speed
     //const rollSpeed = 0.05; // Roll speed - adjust this for the size of the ball
 
     // Forward and backward movement - along the Z-axis
     if (input.keys.has('ArrowUp')) {
       iron_ball_2.position.z -= movementSpeed * dt;
       // Roll around the X-axis
-      iron_ball_2.rotation.x += movementSpeed * dt / (Math.PI * iron_ball_2.scale.x); // Assuming the ball's diameter is 1 unit
+      iron_ball_2.rotation.x -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.x); // Assuming the ball's diameter is 1 unit
     }
     if (input.keys.has('ArrowDown')) {
       iron_ball_2.position.z += movementSpeed * dt;
       // Roll around the X-axis in the opposite direction
-      iron_ball_2.rotation.x -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.x); // Assuming the ball's diameter is 1 unit
+      iron_ball_2.rotation.x += movementSpeed * dt / (Math.PI * iron_ball_2.scale.x); // Assuming the ball's diameter is 1 unit
     }
 
     // Left and right movement - along the X-axis
     if (input.keys.has('ArrowLeft')) {
       iron_ball_2.position.x -= movementSpeed * dt;
       // Roll around the Y-axis
-      iron_ball_2.rotation.y += movementSpeed * dt / (Math.PI * iron_ball_2.scale.y); // Assuming the ball's diameter is 1 unit
+      iron_ball_2.rotation.z += movementSpeed * dt / (Math.PI * iron_ball_2.scale.z); // Assuming the ball's diameter is 1 unit
     }
     if (input.keys.has('ArrowRight')) {
       iron_ball_2.position.x += movementSpeed * dt;
       // Roll around the Y-axis in the opposite direction
-      iron_ball_2.rotation.y -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.y); // Assuming the ball's diameter is 1 unit
+      iron_ball_2.rotation.z -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.z); // Assuming the ball's diameter is 1 unit
     }
 
     // Clamp the ball's position to the plane's boundaries
@@ -84,8 +83,5 @@ window.loop = (dt, input) => {
 
   // Render the scene
   renderer.render(scene, camera);
+
 };
-
-
-
-
