@@ -26,7 +26,7 @@ window.init = async () => {
   const texture = new THREE.TextureLoader().load('./assets/153_artificial green grass texture-seamless.jpg');
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(75, 75);
+  texture.repeat.set(10, 10);
   const material = new THREE.MeshBasicMaterial({
     map: texture,
   });
@@ -45,8 +45,8 @@ window.init = async () => {
 
 window.loop = (dt, input) => {
   if (iron_ball_2) {
-    const movementSpeed = 0.1; // Adjust the movement speed as needed
-    const rotationSpeed = 0.2;
+    const movementSpeed = 0.005; // Adjust the movement speed as needed
+    const rotationSpeed = 0.5;
 
     // Forward and backward movement - along the Z-axis
     if (input.keys.has('ArrowUp')) {
