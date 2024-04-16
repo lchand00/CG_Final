@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let renderer, scene, camera, iron_ball_2;
 
@@ -42,13 +43,6 @@ window.init = async () => {
   console.log('made a scene', iron_ball_2);
 };
 
-//let acc = 0.0001;
-
-// Decrease the turn speed for slower rotation
-//let turnSpeed = 0.0001;
-
-//let drag = 0.98;
-//let velocity = 0;
 window.loop = (dt, input) => {
   if (iron_ball_2) {
     const movementSpeed = 0.002; // Movement speed
