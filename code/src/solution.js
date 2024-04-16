@@ -46,20 +46,26 @@ window.init = async () => {
 window.loop = (dt, input) => {
   if (iron_ball_2) {
     const movementSpeed = 0.1; // Adjust the movement speed as needed
+    const rotationSpeed = 0.2;
 
     // Movement based on keyboard input
     if (input.keys.has('ArrowUp')) {
       iron_ball_2.position.z -= movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowDown')) {
       iron_ball_2.position.z += movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowLeft')) {
       iron_ball_2.position.x -= movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowRight')) {
       iron_ball_2.position.x += movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
+    
 
     // Clamp the ball's position to the plane's boundaries
     const planeBoundaryX = 50 / 2; // half the width
