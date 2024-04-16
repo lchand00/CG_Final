@@ -46,21 +46,26 @@ window.init = async () => {
 window.loop = (dt, input) => {
   if (iron_ball_2) {
     const movementSpeed = 0.1; // Adjust the movement speed as needed
+    const rotationSpeed = 0.2;
 
     // Forward and backward movement - along the Z-axis
     if (input.keys.has('ArrowUp')) {
       iron_ball_2.position.z -= movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowDown')) {
       iron_ball_2.position.z += movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
 
     // Left and right movement - along the X-axis
     if (input.keys.has('ArrowLeft')) {
       iron_ball_2.position.x -= movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowRight')) {
       iron_ball_2.position.x += movementSpeed * dt;
+      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     
 
