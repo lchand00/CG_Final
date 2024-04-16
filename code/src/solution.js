@@ -70,6 +70,7 @@ window.loop = (dt, input) => {
       // Roll around the Y-axis in the opposite direction
       iron_ball_2.rotation.z -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.z); // Assuming the ball's diameter is 1 unit
     }
+    
 
     // Clamp the ball's position to the plane's boundaries
     const planeBoundaryX = 50 / 2; // half the width
