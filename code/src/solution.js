@@ -26,7 +26,7 @@ window.init = async () => {
   const texture = new THREE.TextureLoader().load('./assets/153_artificial green grass texture-seamless.jpg');
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(50, 50);
+  texture.repeat.set(75, 75);
   const material = new THREE.MeshBasicMaterial({
     map: texture,
   });
@@ -46,24 +46,21 @@ window.init = async () => {
 window.loop = (dt, input) => {
   if (iron_ball_2) {
     const movementSpeed = 0.1; // Adjust the movement speed as needed
-    const rotationSpeed = 0.2;
 
-    // Movement based on keyboard input
+    // Forward and backward movement - along the Z-axis
     if (input.keys.has('ArrowUp')) {
       iron_ball_2.position.z -= movementSpeed * dt;
-      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowDown')) {
       iron_ball_2.position.z += movementSpeed * dt;
-      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
+
+    // Left and right movement - along the X-axis
     if (input.keys.has('ArrowLeft')) {
       iron_ball_2.position.x -= movementSpeed * dt;
-      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     if (input.keys.has('ArrowRight')) {
       iron_ball_2.position.x += movementSpeed * dt;
-      iron_ball_2.rotation.y += rotationSpeed * dt;
     }
     
 
@@ -73,12 +70,14 @@ window.loop = (dt, input) => {
     iron_ball_2.position.x = Math.max(-planeBoundaryX, Math.min(planeBoundaryX, iron_ball_2.position.x));
     iron_ball_2.position.z = Math.max(-planeBoundaryZ, Math.min(planeBoundaryZ, iron_ball_2.position.z));
 
-    // Update the camera to follow the ball's movement
-    camera.position.x = iron_ball_2.position.x + 10;
-    camera.position.z = iron_ball_2.position.z + 10;
+    // Keep the camera looking at the ball
     camera.lookAt(iron_ball_2.position);
   }
 
   // Render the scene
   renderer.render(scene, camera);
 };
+
+
+
+
