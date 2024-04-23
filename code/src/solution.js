@@ -119,11 +119,11 @@ window.loop = (dt) => {
     }
     if (keysPressed.has('ArrowLeft')) {
         iron_ball_2.position.x -= speed;
-        iron_ball_2.rotation.z +=speed;
+        iron_ball_2.rotation.y +=speed;
     }
     if (keysPressed.has('ArrowRight')) {
         iron_ball_2.position.x += speed;
-        iron_ball_2.rotation.z -=speed;
+        iron_ball_2.rotation.y -=speed;
     }
 
     // Keep the ball within the boundaries of the plane
