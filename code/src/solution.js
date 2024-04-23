@@ -27,7 +27,7 @@ window.init = async () => {
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(5, 5, 5);
+    camera.position.set(10, 10, 10);
     camera.lookAt(0, 0, 0);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
@@ -51,20 +51,32 @@ window.init = async () => {
     iron_ball_2.name = 'iron_ball_2'; // Give the ball a name for easier identification
     scene.add(iron_ball_2);
 
-    // Load small rocks (plastic bottles)
-    const boneModel = await load('./assets/plastic_water_bottle/scene.gltf');
-    boneModel.scale.set(0.2, 0.2, 0.2);
-    const safeArea = 25 - 1; // half of plane size minus a bit for margin
+   // Load plastic bottles
+    const bottleModel = await load('./assets/plastic_water_bottle/scene.gltf');
+    bottleModel.scale.set(0.2, 0.2, 0.2);
 
-    // Place small rocks
+    // Define the number of rows and bottles per row
+    const numRows = 4;
+    const numBottlesPerRow = Math.ceil(numRocks / numRows);
+    const spacing = 10; // Spacing between bottles
+
+    // Calculate the starting positions
+    const startX = -((numBottlesPerRow - 1) * spacing) / 2;
+    const startZ = -((numRows - 1) * spacing) / 2;
+
     for (let i = 0; i < numRocks; i++) {
-        const bone = boneModel.clone();
-        const randomX = Math.random() * safeArea * 2 - safeArea;
-        const randomZ = Math.random() * safeArea * 2 - safeArea;
-        bone.position.set(randomX, 0, randomZ);
-        bone.name = `dinobone_${i}`;
-        scene.add(bone);
+        const row = Math.floor(i / numBottlesPerRow);
+        const col = i % numBottlesPerRow;
+
+        const x = startX + col * spacing;
+        const z = startZ + row * spacing;
+
+        const bottle = bottleModel.clone();
+        bottle.position.set(x, 0, z);
+        bottle.name = `bottle_${i}`;
+        scene.add(bottle);
     }
+
 
     // Start the animation loop
     animate();
@@ -77,7 +89,7 @@ function check() {
 
     for (let i = scene.children.length - 1; i >= 0; i--) {
         const obj = scene.children[i];
-        if (obj.name.startsWith('dinobone')) {
+        if (obj.name.startsWith('bottle')) {
             const smallRockBox = new THREE.Box3().setFromObject(obj);
             if (box.intersectsBox(smallRockBox)) {
                 scene.remove(obj);
