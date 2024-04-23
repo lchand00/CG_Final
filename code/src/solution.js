@@ -3,8 +3,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Game variables
 let renderer, scene, camera, iron_ball_2;
-const numRocks = 15;
-let remainingRocks = numRocks;
+const numbottles =15;
+let remainingBottles = numbottles;
 let gameOver = false;
 const clock = new THREE.Clock(); // Used for determining delta time
 
@@ -19,6 +19,22 @@ const load = (url) => new Promise((resolve, reject) => {
     loader.load(url, (gltf) => resolve(gltf.scene), undefined, reject);
 });
 
+function GameOver() {
+    const gameDiv = document.createElement("div");
+    gameDiv.id = "game-over";
+    gameDiv.style.position = "absolute";
+    gameDiv.style.top = "50%";
+    gameDiv.style.left = "50%";
+    gameDiv.style.transform = "translate(-50%, -50%)";
+    gameDiv.style.backgroundColor = "rgba(1, 1, 1, 0.8)";
+    gameDiv.style.color = "white";
+    gameDiv.style.padding = "20px";
+    gameDiv.innerHTML = `
+      <h1>Hurray...!! Game Over!</h1>
+    `;
+    document.body.appendChild(gameDiv);
+  }
+
 // Initialize the scene
 window.init = async () => {
     renderer = new THREE.WebGLRenderer();
@@ -27,7 +43,7 @@ window.init = async () => {
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(10, 10, 10);
+    camera.position.set(12, 12, 12);
     camera.lookAt(0, 0, 0);
 
     const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
@@ -46,7 +62,7 @@ window.init = async () => {
 
     // Load the iron ball model
     iron_ball_2 = await load('./assets/iron_ball_2/scene.gltf');
-    iron_ball_2.position.set(0, 1.5, 0);
+    iron_ball_2.position.set(0, 1.8, 0);
     iron_ball_2.scale.set(0.2, 0.2, 0.2);
     iron_ball_2.name = 'iron_ball_2'; // Give the ball a name for easier identification
     scene.add(iron_ball_2);
@@ -57,14 +73,14 @@ window.init = async () => {
 
     // Define the number of rows and bottles per row
     const numRows = 4;
-    const numBottlesPerRow = Math.ceil(numRocks / numRows);
+    const numBottlesPerRow = Math.ceil(numbottles / numRows);
     const spacing = 10; // Spacing between bottles
 
     // Calculate the starting positions
     const startX = -((numBottlesPerRow - 1) * spacing) / 2;
     const startZ = -((numRows - 1) * spacing) / 2;
 
-    for (let i = 0; i < numRocks; i++) {
+    for (let i = 0; i < numbottles; i++) {
         const row = Math.floor(i / numBottlesPerRow);
         const col = i % numBottlesPerRow;
 
@@ -83,27 +99,26 @@ window.init = async () => {
 };
 
 // Collision detection and game logic
-function check() {
+function collidebottles() {
     const p = iron_ball_2;
     const box = new THREE.Box3().setFromObject(p);
 
-    for (let i = scene.children.length - 1; i >= 0; i--) {
+    for (let i = scene.children.length - 1; i >=0; i--) {
         const obj = scene.children[i];
         if (obj.name.startsWith('bottle')) {
             const smallRockBox = new THREE.Box3().setFromObject(obj);
             if (box.intersectsBox(smallRockBox)) {
                 scene.remove(obj);
-                remainingRocks--;
+                remainingBottles--;
                 p.scale.multiplyScalar(1.1);
                 
-                if (remainingRocks === 0) {
+                if (remainingBottles === 0) {
                     gameOver = true;
-                    console.log('Game Over: All plastic bottles have been collected!');
-                    break; // All bottles are collected, no need to check further
-                }
+                    GameOver();
             }
         }
     }
+}
 }
 
 // The main game loop
@@ -131,11 +146,11 @@ window.loop = (dt) => {
     }
     if (keysPressed.has('ArrowLeft')) {
         iron_ball_2.position.x -= speed;
-        iron_ball_2.rotation.y +=speed;
+        iron_ball_2.rotation.z +=speed;
     }
     if (keysPressed.has('ArrowRight')) {
         iron_ball_2.position.x += speed;
-        iron_ball_2.rotation.y -=speed;
+        iron_ball_2.rotation.z -=speed;
     }
 
     // Keep the ball within the boundaries of the plane
@@ -143,12 +158,12 @@ window.loop = (dt) => {
     iron_ball_2.position.clampScalar(-planeBoundary, planeBoundary);
 
     // Update the camera to follow the ball
-    const cameraOffset = new THREE.Vector3(10, 10, 10);
+    const cameraOffset = new THREE.Vector3(12, 12, 12);
     camera.position.copy(iron_ball_2.position).add(cameraOffset);
     camera.lookAt(iron_ball_2.position);
 
     // Perform collision detection
-    check();
+    collidebottles();
 
     // Render the scene
     renderer.render(scene, camera);
