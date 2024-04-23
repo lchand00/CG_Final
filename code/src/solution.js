@@ -1,88 +1,153 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+// Game variables
 let renderer, scene, camera, iron_ball_2;
+const numRocks = 15;
+let remainingRocks = numRocks;
+let gameOver = false;
+const clock = new THREE.Clock(); // Used for determining delta time
 
+// Input handling
+const keysPressed = new Set();
+document.addEventListener('keydown', (event) => keysPressed.add(event.key));
+document.addEventListener('keyup', (event) => keysPressed.delete(event.key));
+
+// Utility to load GLTF models
 const load = (url) => new Promise((resolve, reject) => {
-  const loader = new GLTFLoader();
-  loader.load(url, (gltf) => resolve(gltf.scene), undefined, reject);
+    const loader = new GLTFLoader();
+    loader.load(url, (gltf) => resolve(gltf.scene), undefined, reject);
 });
 
+// Initialize the scene
 window.init = async () => {
-  renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(10, 10, 10); // Updated camera position
-  camera.lookAt(0, 0, 0);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(5, 5, 5);
+    camera.lookAt(0, 0, 0);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
-  scene.add(directionalLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
+    scene.add(directionalLight);
 
-  const geometry = new THREE.PlaneGeometry(1, 1);
-  const texture = new THREE.TextureLoader().load('./assets/Grass_seamless.jpg');
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(5, 5);
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-  });
-  const plane = new THREE.Mesh(geometry, material);
-  plane.rotateX(-Math.PI / 2);
-  plane.scale.set(50, 50, 50);
-  scene.add(plane);
+    const geometry = new THREE.PlaneGeometry(1, 1);
+    const texture = new THREE.TextureLoader().load('./assets/Grass.jpg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(10, 10);
+    const material = new THREE.MeshBasicMaterial({ map: texture });
+    const plane = new THREE.Mesh(geometry, material);
+    plane.rotateX(-Math.PI / 2);
+    plane.scale.set(50, 50, 50);
+    scene.add(plane);
 
-  iron_ball_2 = await load('./assets/iron_ball_2/scene.gltf');
-  iron_ball_2.position.y += 1.5; // Keep model lifted above the plane
-  iron_ball_2.scale.set(0.2, 0.2, 0.2); // Scale down the model
-  scene.add(iron_ball_2);
+    // Load the iron ball model
+    iron_ball_2 = await load('./assets/iron_ball_2/scene.gltf');
+    iron_ball_2.position.set(0, 1.5, 0);
+    iron_ball_2.scale.set(0.2, 0.2, 0.2);
+    iron_ball_2.name = 'iron_ball_2'; // Give the ball a name for easier identification
+    scene.add(iron_ball_2);
 
-  console.log('made a scene', iron_ball_2);
+    // Load small rocks (plastic bottles)
+    const boneModel = await load('./assets/plastic_water_bottle/scene.gltf');
+    boneModel.scale.set(0.2, 0.2, 0.2);
+    const safeArea = 25 - 1; // half of plane size minus a bit for margin
+
+    // Place small rocks
+    for (let i = 0; i < numRocks; i++) {
+        const bone = boneModel.clone();
+        const randomX = Math.random() * safeArea * 2 - safeArea;
+        const randomZ = Math.random() * safeArea * 2 - safeArea;
+        bone.position.set(randomX, 0, randomZ);
+        bone.name = `dinobone_${i}`;
+        scene.add(bone);
+    }
+
+    // Start the animation loop
+    animate();
 };
-window.loop = (dt, input) => {
-  if (iron_ball_2) {
-    const movementSpeed = 0.005; // Movement speed
-    //const rollSpeed = 0.05; // Roll speed - adjust this for the size of the ball
 
-    // Forward and backward movement - along the Z-axis
-    if (input.keys.has('ArrowUp')) {
-      iron_ball_2.position.z -= movementSpeed * dt;
-      // Roll around the X-axis
-      iron_ball_2.rotation.x -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.x); // Assuming the ball's diameter is 1 unit
+// Collision detection and game logic
+function check() {
+    const p = iron_ball_2;
+    const box = new THREE.Box3().setFromObject(p);
+
+    for (let i = scene.children.length - 1; i >= 0; i--) {
+        const obj = scene.children[i];
+        if (obj.name.startsWith('dinobone')) {
+            const smallRockBox = new THREE.Box3().setFromObject(obj);
+            if (box.intersectsBox(smallRockBox)) {
+                scene.remove(obj);
+                remainingRocks--;
+                p.scale.multiplyScalar(1.1);
+                
+                if (remainingRocks === 0) {
+                    gameOver = true;
+                    console.log('Game Over: All plastic bottles have been collected!');
+                    break; // All bottles are collected, no need to check further
+                }
+            }
+        }
     }
-    if (input.keys.has('ArrowDown')) {
-      iron_ball_2.position.z += movementSpeed * dt;
-      // Roll around the X-axis in the opposite direction
-      iron_ball_2.rotation.x += movementSpeed * dt / (Math.PI * iron_ball_2.scale.x); // Assuming the ball's diameter is 1 unit
+}
+
+// The main game loop
+window.loop = (dt) => {
+    if (gameOver) {
+        return; // Stop the game loop if game is over
     }
 
-    // Left and right movement - along the X-axis
-    if (input.keys.has('ArrowLeft')) {
-      iron_ball_2.position.x -= movementSpeed * dt;
-      // Roll around the Y-axis
-      iron_ball_2.rotation.z += movementSpeed * dt / (Math.PI * iron_ball_2.scale.z); // Assuming the ball's diameter is 1 unit
+    if (!iron_ball_2) {
+        console.warn('The iron ball is not yet loaded.');
+        return; // If the ball isn't loaded yet, don't try to update its position
     }
-    if (input.keys.has('ArrowRight')) {
-      iron_ball_2.position.x += movementSpeed * dt;
-      // Roll around the Y-axis in the opposite direction
-      iron_ball_2.rotation.z -= movementSpeed * dt / (Math.PI * iron_ball_2.scale.z); // Assuming the ball's diameter is 1 unit
+
+    // Movement speed is based on the delta time
+    const speed = 5 * dt / 1000; // Convert dt from milliseconds to seconds
+
+    // Keyboard controls for moving the ball
+    if (keysPressed.has('ArrowUp')) {
+        iron_ball_2.position.z -= speed;
+        iron_ball_2.rotation.x +=speed;
     }
-    
+    if (keysPressed.has('ArrowDown')) {
+        iron_ball_2.position.z += speed;
+        iron_ball_2.rotation.x -=speed;
+    }
+    if (keysPressed.has('ArrowLeft')) {
+        iron_ball_2.position.x -= speed;
+        iron_ball_2.rotation.z +=speed;
+    }
+    if (keysPressed.has('ArrowRight')) {
+        iron_ball_2.position.x += speed;
+        iron_ball_2.rotation.z -=speed;
+    }
 
-    // Clamp the ball's position to the plane's boundaries
-    const planeBoundaryX = 50 / 2; // half the width
-    const planeBoundaryZ = 50 / 2; // half the depth
-    iron_ball_2.position.x = Math.max(-planeBoundaryX, Math.min(planeBoundaryX, iron_ball_2.position.x));
-    iron_ball_2.position.z = Math.max(-planeBoundaryZ, Math.min(planeBoundaryZ, iron_ball_2.position.z));
+    // Keep the ball within the boundaries of the plane
+    const planeBoundary = 25; // Assuming the plane is centered and is 50 units wide
+    iron_ball_2.position.clampScalar(-planeBoundary, planeBoundary);
 
-    // Keep the camera looking at the ball
+    // Update the camera to follow the ball
+    const cameraOffset = new THREE.Vector3(10, 10, 10);
+    camera.position.copy(iron_ball_2.position).add(cameraOffset);
     camera.lookAt(iron_ball_2.position);
-  }
 
-  // Render the scene
-  renderer.render(scene, camera);
+    // Perform collision detection
+    check();
 
+    // Render the scene
+    renderer.render(scene, camera);
 };
+
+// Animation frame update loop
+function animate() {
+    requestAnimationFrame(animate);
+    const deltaTime = clock.getDelta(); // Get the time passed since the last frame
+    window.loop(deltaTime); // Update the game with the delta time
+}
+
+// Call the init function to start the game
+//window.init();

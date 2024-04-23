@@ -1,0 +1,11 @@
+Model Information:
+* title:	Eigg Dinosaur Bone
+* source:	https://sketchfab.com/3d-models/eigg-dinosaur-bone-6e670b8f91e947d6860f14016540c7bb
+* author:	Matt Humpage (https://sketchfab.com/MattHumpage)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Eigg Dinosaur Bone" (https://sketchfab.com/3d-models/eigg-dinosaur-bone-6e670b8f91e947d6860f14016540c7bb) by Matt Humpage (https://sketchfab.com/MattHumpage) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -81,3 +81,4 @@ window.onload = () => {
   // https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
   window.requestAnimationFrame(loop);
 };
+

@@ -1,0 +1,11 @@
+Model Information:
+* title:	A spiny ammonite
+* source:	https://sketchfab.com/3d-models/a-spiny-ammonite-69762763d05f4be19849b5d6024e282a
+* author:	EDDyLab @ULiege (https://sketchfab.com/eddylab)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "A spiny ammonite" (https://sketchfab.com/3d-models/a-spiny-ammonite-69762763d05f4be19849b5d6024e282a) by EDDyLab @ULiege (https://sketchfab.com/eddylab) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
