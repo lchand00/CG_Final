@@ -1,0 +1,11 @@
+Model Information:
+* title:	Gyro Steel Balls
+* source:	https://sketchfab.com/3d-models/gyro-steel-balls-d0a8c732604a47e39aef04c63aaeae8d
+* author:	Troube_Truffle (https://sketchfab.com/Troube_Truffle)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Gyro Steel Balls" (https://sketchfab.com/3d-models/gyro-steel-balls-d0a8c732604a47e39aef04c63aaeae8d) by Troube_Truffle (https://sketchfab.com/Troube_Truffle) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
