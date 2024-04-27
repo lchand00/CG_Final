@@ -16,7 +16,12 @@ document.addEventListener('keyup', (event) => keysPressed.delete(event.key));
 // Utility to load GLTF models
 const load = (url) => new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
-    loader.load(url, (gltf) => resolve(gltf.scene), undefined, reject);
+    loader.load(
+        url,
+        (gltf) => resolve(gltf.scene),
+        undefined,
+        (error) => reject(error)
+    );
 });
 
 function GameOver() {
@@ -31,9 +36,19 @@ function GameOver() {
     gameDiv.style.padding = "20px";
     gameDiv.innerHTML = `
       <h1>Hurray...!! Game Over!</h1>
+      
     `;
     document.body.appendChild(gameDiv);
   }
+  function restartGame() {
+    gameOver = false;
+    remainingBottles = numBottles;
+
+    document.getElementById("game-over").remove();
+
+    // Re-add bottles and reset ball position
+    init();
+}
 
 // Initialize the scene
 window.init = async () => {
@@ -57,7 +72,7 @@ window.init = async () => {
     const material = new THREE.MeshBasicMaterial({ map: texture });
     const plane = new THREE.Mesh(geometry, material);
     plane.rotateX(-Math.PI / 2);
-    plane.scale.set(50, 50, 50);
+    //plane.scale.set(50, 50, 50);
     scene.add(plane);
 
     // Load the iron ball model
@@ -98,27 +113,45 @@ window.init = async () => {
     animate();
 };
 
-// Collision detection and game logic
-function collidebottles() {
-    const p = iron_ball_2;
-    const box = new THREE.Box3().setFromObject(p);
+// Collision detection and attachment logic
+function attachBottleToBall(ball, bottle) {
+    const worldPosition = bottle.position.clone();
+    const localPosition = ball.worldToLocal(worldPosition);
 
-    for (let i = scene.children.length - 1; i >=0; i--) {
-        const obj = scene.children[i];
-        if (obj.name.startsWith('bottle')) {
-            const smallRockBox = new THREE.Box3().setFromObject(obj);
-            if (box.intersectsBox(smallRockBox)) {
-                scene.remove(obj);
+    bottle.position.copy(localPosition);
+    ball.add(bottle); // Attach bottle to the ball
+    ball.scale.multiplyScalar(1.05); // Slightly increase the ball's size
+}
+
+function collidebottles() {
+    if (!iron_ball_2) {
+        console.warn("Iron ball not initialized");
+        return;
+    }
+
+    const ballBox = new THREE.Box3().setFromObject(iron_ball_2);
+
+    scene.children.forEach((obj) => {
+        if (obj.name.startsWith("bottle")) {
+            const bottleBox = new THREE.Box3().setFromObject(obj);
+
+            if (ballBox.intersectsBox(bottleBox)) {
+                attachBottleToBall(iron_ball_2, obj); // Attach the bottle to the ball
                 remainingBottles--;
-                p.scale.multiplyScalar(1.1);
-                
+
                 if (remainingBottles === 0) {
                     gameOver = true;
-                    GameOver();
+                    GameOver(); // Trigger the game over message
+                }
             }
         }
-    }
+    });
 }
+
+function animate() {
+    requestAnimationFrame(animate);
+    const deltaTime = clock.getDelta(); // Time passed since the last frame
+    window.loop(deltaTime); // Update the game with the delta time
 }
 
 // The main game loop
@@ -127,10 +160,10 @@ window.loop = (dt) => {
         return; // Stop the game loop if game is over
     }
 
-    if (!iron_ball_2) {
+    /*if (!iron_ball_2) {
         console.warn('The iron ball is not yet loaded.');
         return; // If the ball isn't loaded yet, don't try to update its position
-    }
+    }*/
 
     // Movement speed is based on the delta time
     const speed = 5 * dt / 1000; // Convert dt from milliseconds to seconds
@@ -169,12 +202,8 @@ window.loop = (dt) => {
     renderer.render(scene, camera);
 };
 
-// Animation frame update loop
-function animate() {
-    requestAnimationFrame(animate);
-    const deltaTime = clock.getDelta(); // Get the time passed since the last frame
-    window.loop(deltaTime); // Update the game with the delta time
-}
+// Initialize and start the game
+init();
 
 // Call the init function to start the game
 //window.init();
