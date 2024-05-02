@@ -2,208 +2,244 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Game variables
-let renderer, scene, camera, iron_ball_2;
-const numbottles =15;
-let remainingBottles = numbottles;
+let renderer, scene, camera;
+const numRocks = 10;
+let remainingRocks = numRocks;
 let gameOver = false;
-const clock = new THREE.Clock(); // Used for determining delta time
-
-// Input handling
-const keysPressed = new Set();
-document.addEventListener('keydown', (event) => keysPressed.add(event.key));
-document.addEventListener('keyup', (event) => keysPressed.delete(event.key));
 
 // Utility to load GLTF models
 const load = (url) => new Promise((resolve, reject) => {
-    const loader = new GLTFLoader();
-    loader.load(
-        url,
-        (gltf) => resolve(gltf.scene),
-        undefined,
-        (error) => reject(error)
-    );
+  const loader = new GLTFLoader();
+  loader.load(url, (gltf) => resolve(gltf.scene), undefined, reject);
 });
 
-function GameOver() {
-    const gameDiv = document.createElement("div");
-    gameDiv.id = "game-over";
-    gameDiv.style.position = "absolute";
-    gameDiv.style.top = "50%";
-    gameDiv.style.left = "50%";
-    gameDiv.style.transform = "translate(-50%, -50%)";
-    gameDiv.style.backgroundColor = "rgba(1, 1, 1, 0.8)";
-    gameDiv.style.color = "white";
-    gameDiv.style.padding = "20px";
-    gameDiv.innerHTML = `
-      <h1>Hurray...!! Game Over!</h1>
-      
-    `;
-    document.body.appendChild(gameDiv);
-  }
-  function restartGame() {
-    gameOver = false;
-    remainingBottles = numBottles;
-
-    document.getElementById("game-over").remove();
-
-    // Re-add bottles and reset ball position
-    init();
+// Create a message overlay when the game is over
+function showGameOverMessage() {
+  console.log("SHIVA");
+  const gameOverDiv = document.createElement("div");
+  gameOverDiv.id = "game-over";
+  gameOverDiv.style.position = "absolute";
+  gameOverDiv.style.top = "50%";
+  gameOverDiv.style.left = "50%";
+  gameOverDiv.style.transform = "translate(-50%, -50%)";
+  gameOverDiv.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+  gameOverDiv.style.color = "white";
+  gameOverDiv.style.padding = "20px";
+  gameOverDiv.style.border = "2px solid white";
+  gameOverDiv.innerHTML = `
+    <h1>Game Over!</h1>
+    <p>Congratulations, you've collected all the rocks!</p>
+  `;
+  document.body.appendChild(gameOverDiv);
+}
+function ShowLossMessage() {
+  console.log("SHIVA");
+  const gameOverDiv = document.createElement("div");
+  gameOverDiv.id = "game-over";
+  gameOverDiv.style.position = "absolute";
+  gameOverDiv.style.top = "50%";
+  gameOverDiv.style.left = "50%";
+  gameOverDiv.style.transform = "translate(-50%, -50%)";
+  gameOverDiv.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+  gameOverDiv.style.color = "white";
+  gameOverDiv.style.padding = "20px";
+  gameOverDiv.style.border = "2px solid white";
+  gameOverDiv.innerHTML = `
+    <h1>Game Over!</h1>
+    <p>You Hit a Human You Loss!!</p>
+  `;
+  document.body.appendChild(gameOverDiv);
 }
 
 // Initialize the scene
 window.init = async () => {
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(12, 12, 12);
-    camera.lookAt(0, 0, 0);
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(80,80,80);
+  camera.lookAt(0, 0, 0);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
-    scene.add(directionalLight);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
+  scene.add(directionalLight);
 
-    const geometry = new THREE.PlaneGeometry(1, 1);
-    const texture = new THREE.TextureLoader().load('./assets/Grass.jpg');
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(10, 10);
-    const material = new THREE.MeshBasicMaterial({ map: texture });
-    const plane = new THREE.Mesh(geometry, material);
-    plane.rotateX(-Math.PI / 2);
-    //plane.scale.set(50, 50, 50);
-    scene.add(plane);
+  const geometry = new THREE.PlaneGeometry(10, 10);
+  const texture = new THREE.TextureLoader().load('./assets/Grass.jpg');
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(50, 50);
+  const material = new THREE.MeshBasicMaterial({ map: texture });
+  const plane = new THREE.Mesh(geometry, material);
+  plane.rotateX(-Math.PI / 2);
+  plane.scale.set(100, 100, 100);
 
-    // Load the iron ball model
-    iron_ball_2 = await load('./assets/iron_ball_2/scene.gltf');
-    iron_ball_2.position.set(0, 1.8, 0);
-    iron_ball_2.scale.set(0.2, 0.2, 0.2);
-    iron_ball_2.name = 'iron_ball_2'; // Give the ball a name for easier identification
-    scene.add(iron_ball_2);
+  scene.add(plane);
 
-   // Load plastic bottles
-    const bottleModel = await load('./assets/plastic_water_bottle/scene.gltf');
-    bottleModel.scale.set(0.2, 0.2, 0.2);
+  // Main rock object
+  const rock = await load('./assets/iron_ball_2/scene.gltf');
+  rock.name = 'rock';
+  rock.position.set(0, 8, 0);
+  ///rock.scale.set(1, 1, 1);
+  scene.add(rock);
 
-    // Define the number of rows and bottles per row
-    const numRows = 4;
-    const numBottlesPerRow = Math.ceil(numbottles / numRows);
-    const spacing = 10; // Spacing between bottles
+  // Small rocks
+  const smallRockModel = await load('./assets/toyota/scene.gltf');
+   const range = 100;
 
-    // Calculate the starting positions
-    const startX = -((numBottlesPerRow - 1) * spacing) / 2;
-    const startZ = -((numRows - 1) * spacing) / 2;
+  // Place small rocks at random locations
+  for (let i = 0; i < numRocks; i++) {
+    const smallRock = smallRockModel.clone();
+    smallRock.castShadow=true;
+    const randomX = Math.random() * range - range / 2;
+    const randomZ = Math.random() * range - range / 2;
+    smallRock.position.set(randomX, 0, randomZ);
+    smallRock.scale.set(5,5,5);
+    smallRock.name = `smallrock_${i}`;
+    smallRock.collide=false;
+    scene.add(smallRock);
+  }
 
-    for (let i = 0; i < numbottles; i++) {
-        const row = Math.floor(i / numBottlesPerRow);
-        const col = i % numBottlesPerRow;
+  const treemodel= await load('./assets/plastic_water_bottle/scene.gltf');
+  for (let i = 0; i < numRocks; i++) {
+    const tree = treemodel.clone();
+    tree.castShadow=true;
+    const randomX = Math.random() * 500 - 500 / 2;
+    const randomZ = Math.random() * 500 - 500 / 2;
+    tree.position.set(randomX, 0, randomZ);
+    tree.scale.set(5,5,5);
+    tree.name = `tree_${i}`;
+    tree.collide=false;
+    scene.add(tree);
+  }
+  const PersonModel = await load('./assets/porsche/scene.gltf');
 
-        const x = startX + col * spacing;
-        const z = startZ + row * spacing;
+ // Place small rocks at random locations
+  for (let i = 0; i < numRocks; i++) {
+   const people = PersonModel.clone();
+   people.castShadow=true;
+   const randomX = Math.random() * 600 - 600 / 2;
+   const randomZ = Math.random() * 600 - 600 / 2;
+   people.position.set(randomX, 0, randomZ);
+   people.name = `people_${i}`;
+   people.scale.set(5,5,5);
+   people.collide=false;
+   scene.add(people);
+ }
 
-        const bottle = bottleModel.clone();
-        bottle.position.set(x, 0, z);
-        bottle.name = `bottle_${i}`;
-        scene.add(bottle);
-    }
 
-
-    // Start the animation loop
-    animate();
 };
 
-// Collision detection and attachment logic
-function attachBottleToBall(ball, bottle) {
-    const worldPosition = bottle.position.clone();
-    const localPosition = ball.worldToLocal(worldPosition);
+// Collision check and end game logic
+function check() {
+  const mainRock = scene.getObjectByName('rock');
+  const mainRockBox = new THREE.Box3().setFromObject(mainRock);
 
-    bottle.position.copy(localPosition);
-    ball.add(bottle); // Attach bottle to the ball
-    ball.scale.multiplyScalar(1.05); // Slightly increase the ball's size
-}
+  scene.children.forEach((obj) => {
+    if ((obj.name.startsWith('smallrock') || obj.name.startsWith('tree')) && !obj.collide) {
+      const smallRockBox = new THREE.Box3().setFromObject(obj);
+      if (mainRockBox.intersectsBox(smallRockBox)) {
+        const c = mainRock.worldToLocal(obj.position);
+        console.log("Before:", obj.position);
+        obj.parent = mainRock;
 
-function collidebottles() {
-    if (!iron_ball_2) {
-        console.warn("Iron ball not initialized");
-        return;
-    }
+        obj.position.x=c.x;
+        obj.position.y=c.y;
+        obj.position.z=c.z;
 
-    const ballBox = new THREE.Box3().setFromObject(iron_ball_2);
+        console.log("After:", obj.position);
+        console.log(mainRock.position);
 
-    scene.children.forEach((obj) => {
-        if (obj.name.startsWith("bottle")) {
-            const bottleBox = new THREE.Box3().setFromObject(obj);
-
-            if (ballBox.intersectsBox(bottleBox)) {
-                attachBottleToBall(iron_ball_2, obj); // Attach the bottle to the ball
-                remainingBottles--;
-
-                if (remainingBottles === 0) {
-                    gameOver = true;
-                    GameOver(); // Trigger the game over message
-                }
-            }
+        remainingRocks--;
+        obj.collide=true;
+        if (remainingRocks === 0) {
+          gameOver = true;
+          showGameOverMessage(); // Show game over message
         }
+      }
+    }
+  });
+}
+
+function Check1() {
+  const mainRock = scene.getObjectByName('rock');
+  const mainRockBox = new THREE.Box3().setFromObject(mainRock);
+  scene.children.forEach((obj) => {
+    if (obj.name.startsWith('people')) {
+      const person = new THREE.Box3().setFromObject(obj);
+      if (mainRockBox.intersectsBox(person)) {
+          gameOver = true;
+          ShowLossMessage();
+        }
+      }
     });
-}
+  }
 
-function animate() {
-    requestAnimationFrame(animate);
-    const deltaTime = clock.getDelta(); // Time passed since the last frame
-    window.loop(deltaTime); // Update the game with the delta time
-}
+// Game loop with end game check
+window.loop = (dt, input) => {
+  if (gameOver) {
+    return; // Don't proceed if the game is over
+  }
 
-// The main game loop
-window.loop = (dt) => {
-    if (gameOver) {
-        return; // Stop the game loop if game is over
-    }
+  const p = scene.getObjectByName('rock');
+  let speed = 0.05 * dt;
 
-    /*if (!iron_ball_2) {
-        console.warn('The iron ball is not yet loaded.');
-        return; // If the ball isn't loaded yet, don't try to update its position
-    }*/
+  const planeSizeX = 950;
+  const planeSizeZ = 950;
+  const minX = -planeSizeX / 2;
+  const maxX = planeSizeX / 2;
+  const minZ = -planeSizeZ / 2;
+  const maxZ = planeSizeZ / 2;
 
-    // Movement speed is based on the delta time
-    const speed = 5 * dt / 1000; // Convert dt from milliseconds to seconds
+ 
+  if (input.keys.has('ArrowUp') && p.position.z - speed >= minZ) {
+    console.log(p.rotation.x);
+    console.log(p.rotation.y);
+    console.log(p.rotation.z);
+    p.position.z -= speed;
+    p.rotation.x -= 0.02 * dt;
+    camera.position.copy(p.position);
+    camera.position.add(new THREE.Vector3(80,80,80)); 
+    camera.lookAt(p.position);
+    Check1();
+    check();
+  }
 
-    // Keyboard controls for moving the ball
-    if (keysPressed.has('ArrowUp')) {
-        iron_ball_2.position.z -= speed;
-        iron_ball_2.rotation.x +=speed;
-    }
-    if (keysPressed.has('ArrowDown')) {
-        iron_ball_2.position.z += speed;
-        iron_ball_2.rotation.x -=speed;
-    }
-    if (keysPressed.has('ArrowLeft')) {
-        iron_ball_2.position.x -= speed;
-        iron_ball_2.rotation.z +=speed;
-    }
-    if (keysPressed.has('ArrowRight')) {
-        iron_ball_2.position.x += speed;
-        iron_ball_2.rotation.z -=speed;
-    }
+  if (input.keys.has('ArrowDown') && p.position.z + speed <= maxZ) {
+    p.position.z += speed;
+    p.rotation.x += 0.02 * dt;
+    camera.position.copy(p.position);
+    camera.position.add(new THREE.Vector3(80,80,80));
+    camera.lookAt(p.position);
+    Check1();
+    check();
+  }
 
-    // Keep the ball within the boundaries of the plane
-    const planeBoundary = 25; // Assuming the plane is centered and is 50 units wide
-    iron_ball_2.position.clampScalar(-planeBoundary, planeBoundary);
+  if (input.keys.has('ArrowLeft') && p.position.x - speed >= minX) {
+    p.rotation.x = 0;
+    p.position.x -= speed;
+    p.rotation.z += 0.02 * dt;
+    camera.position.copy(p.position);
+    camera.position.add(new THREE.Vector3(80,80,80)); 
+    camera.lookAt(p.position); 
+    Check1();
+    check();
+  }
 
-    // Update the camera to follow the ball
-    const cameraOffset = new THREE.Vector3(12, 12, 12);
-    camera.position.copy(iron_ball_2.position).add(cameraOffset);
-    camera.lookAt(iron_ball_2.position);
+  if (input.keys.has('ArrowRight') && p.position.x + speed <= maxX) {
+    p.rotation.x = 0;
+    p.position.x += speed;
+    p.rotation.z -= 0.02 * dt;
+    camera.position.copy(p.position);
+    camera.position.add(new THREE.Vector3(80,80,80)); 
+    camera.lookAt(p.position); 
+    Check1();
+    check();
+  }
+  if(input.keys.has('ArrowRight')){
+    
+  }
 
-    // Perform collision detection
-    collidebottles();
-
-    // Render the scene
-    renderer.render(scene, camera);
+  renderer.render(scene, camera);
 };
-
-// Initialize and start the game
-init();
-
-// Call the init function to start the game
-//window.init();
