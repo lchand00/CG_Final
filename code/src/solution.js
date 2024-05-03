@@ -315,7 +315,11 @@ window.loop = (dt) => {
   Collision(); // ensure this also checks for undefined objects
   renderer.render(scene, camera);
 };
-
+function initGame() {
+  // Initialize your game here
+  console.log("Game has started!");
+  // More initialization code as needed
+}
 
 
 document.getElementById('startButton').addEventListener('click', startGame);
@@ -325,6 +329,6 @@ function startGame() {
     document.getElementById('startScreen').style.display = 'none';
 
     // Start the game initialization or resume the game
-    initGame(); // Assuming initGame is the function that starts or resumes your game
+    initGame(); 
 }
 
