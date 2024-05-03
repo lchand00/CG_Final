@@ -83,11 +83,6 @@ function startGame() {
     initGame();
 }
 
-function initGame() {
-    // Initialize your game here
-    console.log("Game has started!");
-    // More initialization code as needed
-}
 
 
   // attach the solution script
