@@ -1,0 +1,11 @@
+Model Information:
+* title:	Fast Food Soda Cup
+* source:	https://sketchfab.com/3d-models/fast-food-soda-cup-363537b2f81f43259aa587c8c5663c8e
+* author:	Adam.White (https://sketchfab.com/Adam.White)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Fast Food Soda Cup" (https://sketchfab.com/3d-models/fast-food-soda-cup-363537b2f81f43259aa587c8c5663c8e) by Adam.White (https://sketchfab.com/Adam.White) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Minecraft Tardis Build Schematic
+* source:	https://sketchfab.com/3d-models/minecraft-tardis-build-schematic-9acd811d5c2844fb9a8c8566f0614ff0
+* author:	inostupid (https://sketchfab.com/inostupid)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Minecraft Tardis Build Schematic" (https://sketchfab.com/3d-models/minecraft-tardis-build-schematic-9acd811d5c2844fb9a8c8566f0614ff0) by inostupid (https://sketchfab.com/inostupid) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

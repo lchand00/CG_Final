@@ -1,0 +1,8 @@
+Model Information:
+* title:	Stop Sign
+* source:	https://sketchfab.com/3d-models/stop-sign-086de3f333de459ba23754b8751e3956
+* author:	bottomfrog (https://sketchfab.com/bottomfrog)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
