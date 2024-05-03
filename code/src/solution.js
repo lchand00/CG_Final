@@ -4,11 +4,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 let gameOver=false;
 let sodas=7;
 // Game variables
-let renderer, scene, camera, iron_ball;
+let renderer, scene, camera, iron_ball, acceleration;
 
 const keysPressed = new Set();
 document.addEventListener('keydown', (event) => keysPressed.add(event.key));
 document.addEventListener('keyup', (event) => keysPressed.delete(event.key));
+
+
 
 // Utility to load GLTF models
 const load = (url) => new Promise((resolve, reject) => {
@@ -30,6 +32,34 @@ function WinMessage() {
   document.body.appendChild(win);
 }
 
+let audioContext;
+let backgroundMusic;
+
+function initAudio(url) {
+  if (!audioContext) {
+      audioContext = new (window.AudioContext || window.AudioContext)();
+  }
+
+  fetch(url)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+      .then(audioBuffer => {
+          backgroundMusic = audioContext.createBufferSource();
+          backgroundMusic.buffer = audioBuffer;
+          backgroundMusic.loop = true;
+          const gainNode = audioContext.createGain();
+          gainNode.gain.value = 0.5; // Adjust volume
+          backgroundMusic.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          if (audioContext.state === 'suspended') {
+              audioContext.resume(); // Handling autoplay policy
+          }
+          backgroundMusic.start();
+      })
+      .catch(e => console.error('Error with processing audio data', e));
+}
+
+
 // Initialize the scene
 window.init = async () => {
   renderer = new THREE.WebGLRenderer();
@@ -38,8 +68,9 @@ window.init = async () => {
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(80,80,80);
+  camera.position.set(0, 50, 150);  
   camera.lookAt(0, 0, 0);
+  
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
   scene.add(directionalLight);
@@ -56,11 +87,16 @@ window.init = async () => {
 
   scene.add(plane);
 
+  initAudio('./assets/music.mp3');
+
   // Main rock object
   iron_ball = await load('./assets/iron_ball_2/scene.gltf');
   iron_ball.name = 'iron_ball';
-  iron_ball.position.set(0, 8, 0);
+  iron_ball.position.set(0, 8, -100);  // Move the ball away from the building initially
+
   scene.add(iron_ball);
+
+  await placeBuildings();
 
   // Function to place objects in rows
 async function placeObjectsInRows(modelPath, numObjectsPerRow, numRows, prefix, range) {
@@ -159,34 +195,6 @@ async function placeObjectsInRows(modelPath, numObjectsPerRow, numRows, prefix, 
   car4.position.set(300, 0, -300);
   car4.scale.set(5,5,5);
   scene.add(car4);
-
-  const build1 = buildmodel.clone();
-  build1.castShadow = true;
-  build1.scale.set(0.3, 0.3, 0.3);
-  build1.position.set(-55,0,-500);
-  scene.add(build1);
-  
-  const build2 = buildmodel.clone();
-  build2.castShadow = true;
-  build2.scale.set(0.3, 0.3, 0.3);
-  build2.position.set(430,0,-430);
-  scene.add(build2);
-  
-  const build3 = buildmodel.clone();
-  build3.castShadow = true;
-  build3.scale.set(0.3, 0.3, 0.3);
-  build3.position.set(200,0,-470);
-  scene.add(build3);
-  
-  const build4 = buildmodel.clone();
-  build4.scale.set(0.3, 0.3, 0.3);
-  build3.position.set(470,0,-470);
-  scene.add(build4);
-  
-  const build5 = buildmodel.clone();
-  build5.scale.set(0.3, 0.3, 0.3);
-  build4.position.set(-600,0,600);
-  scene.add(build5);
   
   const stop1 = stopmodel.clone();
   stop1.position.set(100, 15, -100);
@@ -215,6 +223,21 @@ async function placeObjectsInRows(modelPath, numObjectsPerRow, numRows, prefix, 
   
 
 };
+
+async function placeBuildings() {
+  const buildModel = await load('./assets/build/scene.gltf');
+  const numBuildings = 20; // Number of buildings you want
+  const planeSize = 1000; // Assuming the plane is 1000x1000
+
+  for (let i = 0; i < numBuildings; i++) {
+    const building = buildModel.clone();
+    const x = Math.random() * planeSize - planeSize / 2;
+    const z = Math.random() * planeSize - planeSize / 2;
+    building.position.set(x, 0, z);
+    building.scale.set(0.3, 0.3, 0.3); // Scale as needed
+    scene.add(building);
+  }
+}
 function Collision() {
   const mainRock = scene.getObjectByName('iron_ball');
   const mainRockBox = new THREE.Box3().setFromObject(mainRock);
@@ -238,42 +261,70 @@ function Collision() {
     }
   });
 }
-
+ acceleration=0;
 window.loop = (dt) => {
   if (gameOver || !iron_ball) {
     return; // Stop the loop if game is over or iron_ball isn't loaded yet
   }
 
-  const speed = 15 * dt / 1000; // adjust speed
+  const speed = acceleration* dt; // adjust speed
 
-    // Keyboard controls for moving the ball
-    if (keysPressed.has('ArrowUp')) {
-        iron_ball.position.z -= speed;
-        iron_ball.rotation.x +=speed;
-    }
-    if (keysPressed.has('ArrowDown')) {
-        iron_ball.position.z += speed;
-        iron_ball.rotation.x -=speed;
-    }
-    if (keysPressed.has('ArrowLeft')) {
-        iron_ball.position.x -= speed;
-        iron_ball.rotation.y +=speed;
-    }
-    if (keysPressed.has('ArrowRight')) {
-        iron_ball.position.x += speed;
-        iron_ball.rotation.y -=speed;
-    }
-    // Keep the ball within the boundaries of the plane
-    const planeBoundary = 200; // Assuming the plane is centered and is 50 units wide
-    iron_ball.position.clampScalar(-planeBoundary, planeBoundary);
-    // Update the camera to follow the ball
-    const cameraOffset = new THREE.Vector3(50,50,50);
-    if (camera && iron_ball) { // Ensure both objects are defined
-      camera.position.copy(iron_ball.position).add(cameraOffset);
-      camera.lookAt(iron_ball.position);
-    }
   
-    Collision(); // ensure this also checks for undefined objects
-    renderer.render(scene, camera);
 
+  // Keyboard controls for moving the ball
+  if (keysPressed.has('ArrowUp')) {
+      if (acceleration<0.1){
+        acceleration+=0.001;
+      }
+      iron_ball.position.z -= speed;
+      iron_ball.rotation.x += speed * 0.5; // Enhanced rotation to mimic rolling
+  }
+  if (keysPressed.has('ArrowDown')) {
+    if (acceleration<0.1){
+      acceleration+=0.001;
+    }
+      iron_ball.position.z += speed;
+      iron_ball.rotation.x -= speed * 0.5; // Enhanced rotation to mimic rolling
+  }
+  if (keysPressed.has('ArrowLeft')) {
+    if (acceleration<0.1){
+      acceleration+=0.001;
+    }
+      iron_ball.position.x -= speed;
+      iron_ball.rotation.z += speed * 0.5; // Rolling effect on turning left
+  }
+  if (keysPressed.has('ArrowRight')) {
+    if (acceleration<0.1){
+      acceleration+=0.001;
+    }
+      iron_ball.position.x += speed;
+      iron_ball.rotation.z -= speed * 0.5; // Rolling effect on turning right
+  }
+
+  // Clamping the ball's position to the plane's boundaries
+  iron_ball.position.x = THREE.MathUtils.clamp(iron_ball.position.x, -500, 500);
+  iron_ball.position.z = THREE.MathUtils.clamp(iron_ball.position.z, -500, 500);
+
+  // Update the camera to follow the ball
+ 
+
+  const desiredCameraPos = iron_ball.position.clone().add(new THREE.Vector3(0, 50, 150));
+  camera.position.lerp(desiredCameraPos, 0.05);  // Smoothly interpolate the camera position
+  camera.lookAt(iron_ball.position);
+
+  Collision(); // ensure this also checks for undefined objects
+  renderer.render(scene, camera);
 };
+
+
+
+document.getElementById('startButton').addEventListener('click', startGame);
+
+function startGame() {
+    // Hide the start screen
+    document.getElementById('startScreen').style.display = 'none';
+
+    // Start the game initialization or resume the game
+    initGame(); // Assuming initGame is the function that starts or resumes your game
+}
+

@@ -74,6 +74,22 @@ window.onload = () => {
     _input.keys.delete(key);
   });
 
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('startButton').addEventListener('click', startGame);
+});
+
+function startGame() {
+    document.getElementById('startScreen').style.display = 'none';
+    initGame();
+}
+
+function initGame() {
+    // Initialize your game here
+    console.log("Game has started!");
+    // More initialization code as needed
+}
+
+
   // attach the solution script
   attachScript();
 
